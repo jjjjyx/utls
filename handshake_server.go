@@ -970,5 +970,7 @@ func clientHelloInfo(ctx context.Context, c *Conn, clientHello *clientHelloMsg) 
 		Conn:              c.conn,
 		config:            c.config,
 		ctx:               ctx,
+
+		Raw: clientHello.raw,
 	}
 }

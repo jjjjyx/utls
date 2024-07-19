@@ -455,6 +455,11 @@ type ClientHelloInfo struct {
 	// might be rejected if used.
 	SupportedVersions []uint16
 
+	// === dz modify start ===
+	// Raw 读取到的client握手信息的原始数据
+	Raw []byte
+	// === dz modify end ===
+
 	// Conn is the underlying net.Conn for the connection. Do not read
 	// from, or write to, this connection; that will cause the TLS
 	// connection to fail.
