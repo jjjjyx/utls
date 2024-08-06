@@ -121,6 +121,9 @@ type Conn struct {
 	activeCall atomic.Int32
 
 	tmp [16]byte
+
+	clientHello *clientHelloMsg
+	//hello       *serverHelloMsg
 }
 
 // Access to net.Conn methods.
@@ -1601,6 +1604,16 @@ func (c *Conn) handshakeContext(ctx context.Context) (ret error) {
 	}
 
 	return c.handshakeErr
+}
+
+func (c *Conn) GetClientHelloRaw() []byte {
+	if c.clientHello == nil {
+		return nil
+	}
+	dest := make([]byte, len(c.clientHello.raw))
+	copy(dest, c.clientHello.raw)
+
+	return dest
 }
 
 // ConnectionState returns basic TLS details about the connection.

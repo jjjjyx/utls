@@ -46,6 +46,8 @@ func (c *Conn) serverHandshake(ctx context.Context) error {
 		return err
 	}
 
+	c.clientHello = clientHello
+
 	if c.vers == VersionTLS13 {
 		hs := serverHandshakeStateTLS13{
 			c:           c,
@@ -168,6 +170,7 @@ func (c *Conn) readClientHello(ctx context.Context) (*clientHelloMsg, error) {
 		return nil, fmt.Errorf("tls: client offered only unsupported versions: %x", clientVersions)
 	}
 	c.haveVers = true
+	//c.clientHello = clientHello
 	c.in.version = c.vers
 	c.out.version = c.vers
 

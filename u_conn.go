@@ -26,6 +26,7 @@ const BuildByGoTLS ClientHelloBuildStatus = 2
 
 type UConn struct {
 	*Conn
+	//clientHello *clientHelloMsg
 
 	Extensions        []TLSExtension
 	ClientHelloID     ClientHelloID
@@ -484,6 +485,8 @@ func (c *UConn) Write(b []byte) (int, error) {
 func (c *UConn) clientHandshake(ctx context.Context) (err error) {
 	// [uTLS section begins]
 	hello := c.HandshakeState.Hello.getPrivatePtr()
+	c.clientHello = hello
+
 	defer func() { c.HandshakeState.Hello = hello.getPublicPtr() }()
 
 	sessionIsLocked := c.utls.sessionController.isSessionLocked()
