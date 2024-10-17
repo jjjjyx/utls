@@ -33,6 +33,7 @@ type UConn struct {
 	sessionController *sessionController
 
 	clientHelloBuildStatus ClientHelloBuildStatus
+	clientHelloSpec        *ClientHelloSpec
 
 	HandshakeState PubClientHandshakeState
 
