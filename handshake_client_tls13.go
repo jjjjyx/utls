@@ -410,10 +410,10 @@ func (hs *clientHandshakeStateTLS13) processHelloRetryRequest() error {
 	// and utlsExtensionPadding are supposed to change
 	if hs.uconn != nil {
 		if hs.uconn.ClientHelloID != HelloGolang {
-			if len(hs.hello.pskIdentities) > 0 {
-				// TODO: wait for someone who cares about PSK to implement
-				return errors.New("uTLS does not support reprocessing of PSK key triggered by HelloRetryRequest")
-			}
+			//if len(hs.hello.pskIdentities) > 0 {
+			//	// TODO: wait for someone who cares about PSK to implement
+			//	return errors.New("uTLS does not support reprocessing of PSK key triggered by HelloRetryRequest")
+			//}
 
 			keyShareExtFound := false
 			for _, ext := range hs.uconn.Extensions {
