@@ -233,8 +233,6 @@ func (chs *ClientHelloSpec) ReadTLSExtensions(b []byte, allowBluntMimicry bool, 
 				} else {
 					extWriter = &FakePreSharedKeyExtension{}
 				}
-				// 忽略 preShared 的解析
-				continue
 			case extensionSupportedVersions:
 				chs.TLSVersMin = 0
 				chs.TLSVersMax = 0

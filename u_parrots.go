@@ -5,7 +5,6 @@
 package tls
 
 import (
-	"crypto/ecdh"
 	crand "crypto/rand"
 	"crypto/sha256"
 	"encoding/binary"
@@ -2626,16 +2625,17 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 		return err
 	}
 
-	privateHello, clientKeySharePrivate, err := uconn.makeClientHelloForApplyPreset()
+	privateHello, err := uconn.makeClientHelloForApplyPreset()
 	if err != nil {
 		return err
 	}
 	uconn.HandshakeState.Hello = privateHello.getPublicPtr()
-	if ecdheKey, ok := clientKeySharePrivate.(*ecdh.PrivateKey); ok {
-		uconn.HandshakeState.State13.EcdheKey = ecdheKey
-	} else if kemKey, ok := clientKeySharePrivate.(*kemPrivateKey); ok {
-		uconn.HandshakeState.State13.KEMKey = kemKey.ToPublic()
-	}
+	// 不需要了，这里会在 KeyShareExtension 被设置，而且 makeClientHelloForApplyPreset 也没有返回 clientKeySharePrivate
+	//if ecdheKey, ok := clientKeySharePrivate.(*ecdh.PrivateKey); ok {
+	//	uconn.HandshakeState.State13.EcdheKey = ecdheKey
+	//} else if kemKey, ok := clientKeySharePrivate.(*kemPrivateKey); ok {
+	//	uconn.HandshakeState.State13.KEMKey = kemKey.ToPublic()
+	//}
 	uconn.HandshakeState.State13.KeySharesParams = NewKeySharesParameters()
 	hello := uconn.HandshakeState.Hello
 

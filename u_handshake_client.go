@@ -181,30 +181,30 @@ func (hs *clientHandshakeStateTLS13) utlsReadServerParameters(encryptedExtension
 	return nil
 }
 
-func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, clientKeySharePrivate, error) {
+func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, error) {
 	config := c.config
 
 	// [UTLS SECTION START]
 	if len(config.ServerName) == 0 && !config.InsecureSkipVerify && len(config.InsecureServerNameToVerify) == 0 {
-		return nil, nil, errors.New("tls: at least one of ServerName, InsecureSkipVerify or InsecureServerNameToVerify must be specified in the tls.Config")
+		return nil, errors.New("tls: at least one of ServerName, InsecureSkipVerify or InsecureServerNameToVerify must be specified in the tls.Config")
 	}
 	// [UTLS SECTION END]
 
 	nextProtosLength := 0
 	for _, proto := range config.NextProtos {
 		if l := len(proto); l == 0 || l > 255 {
-			return nil, nil, errors.New("tls: invalid NextProtos value")
+			return nil, errors.New("tls: invalid NextProtos value")
 		} else {
 			nextProtosLength += 1 + l
 		}
 	}
 	if nextProtosLength > 0xffff {
-		return nil, nil, errors.New("tls: NextProtos values too large")
+		return nil, errors.New("tls: NextProtos values too large")
 	}
 
 	supportedVersions := config.supportedVersions(roleClient)
 	if len(supportedVersions) == 0 {
-		return nil, nil, errors.New("tls: no supported versions satisfy MinVersion and MaxVersion")
+		return nil, errors.New("tls: no supported versions satisfy MinVersion and MaxVersion")
 	}
 
 	clientHelloVersion := config.maxSupportedVersion(roleClient)
@@ -255,7 +255,7 @@ func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, clientKeyShareP
 
 	_, err := io.ReadFull(config.rand(), hello.random)
 	if err != nil {
-		return nil, nil, errors.New("tls: short read from Rand: " + err.Error())
+		return nil, errors.New("tls: short read from Rand: " + err.Error())
 	}
 
 	// A random session ID is used to detect when the server accepted a ticket
@@ -266,7 +266,7 @@ func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, clientKeyShareP
 	if c.quic == nil {
 		hello.sessionId = make([]byte, 32)
 		if _, err := io.ReadFull(config.rand(), hello.sessionId); err != nil {
-			return nil, nil, errors.New("tls: short read from Rand: " + err.Error())
+			return nil, errors.New("tls: short read from Rand: " + err.Error())
 		}
 	}
 
@@ -277,7 +277,6 @@ func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, clientKeyShareP
 		hello.supportedSignatureAlgorithms = testingOnlyForceClientHelloSignatureAlgorithms
 	}
 
-	var secret clientKeySharePrivate // [UTLS]
 	if hello.supportedVersions[0] == VersionTLS13 {
 		// Reset the list of ciphers when the client only supports TLS 1.3.
 		if len(hello.supportedVersions) == 1 {
@@ -289,45 +288,7 @@ func (c *Conn) makeClientHelloForApplyPreset() (*clientHelloMsg, clientKeyShareP
 			hello.cipherSuites = append(hello.cipherSuites, defaultCipherSuitesTLS13NoAES...)
 		}
 
-		// curveID := config.curvePreferences()[0]
-		// // [UTLS SECTION BEGINS]
-		// // Ported from cloudflare/go with modifications to preserve crypto/tls compatibility
-		// if scheme := curveIdToCirclScheme(curveID); scheme != nil {
-		// 	pk, sk, err := generateKemKeyPair(scheme, curveID, config.rand())
-		// 	if err != nil {
-		// 		return nil, nil, fmt.Errorf("generateKemKeyPair %s: %w", scheme.Name(), err)
-		// 	}
-		// 	packedPk, err := pk.MarshalBinary()
-		// 	if err != nil {
-		// 		return nil, nil, fmt.Errorf("pack circl public key %s: %w", scheme.Name(), err)
-		// 	}
-		// 	hello.keyShares = []keyShare{{group: curveID, data: packedPk}}
-		// 	secret = sk
-		// } else {
-		// 	if _, ok := curveForCurveID(curveID); !ok {
-		// 		return nil, nil, errors.New("tls: CurvePreferences includes unsupported curve")
-		// 	}
-		// 	key, err := generateECDHEKey(config.rand(), curveID)
-		// 	if err != nil {
-		// 		return nil, nil, err
-		// 	}
-		// 	hello.keyShares = []keyShare{{group: curveID, data: key.PublicKey().Bytes()}}
-		// 	secret = key
-		// }
-		// // [UTLS SECTION ENDS]
 	}
 
-	// [UTLS] We don't need this, since it is not ready yet
-	// if c.quic != nil {
-	// 	p, err := c.quicGetTransportParameters()
-	// 	if err != nil {
-	// 		return nil, nil, err
-	// 	}
-	// 	if p == nil {
-	// 		p = []byte{}
-	// 	}
-	// 	hello.quicTransportParameters = p
-	// }
-
-	return hello, secret, nil
+	return hello, nil
 }
