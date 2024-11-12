@@ -37,7 +37,8 @@ type kemPrivateKey struct {
 }
 
 var (
-	X25519Kyber512Draft00           = CurveID(0xfe30)
+	X25519Kyber512Draft00 = CurveID(0xfe30)
+	//X25519Kyber512Draft4588_FireFox 4588 @see https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml
 	X25519Kyber512Draft4588_FireFox = CurveID(0x11ec)
 	X25519Kyber768Draft00           = CurveID(0x6399)
 	X25519Kyber768Draft00Old        = CurveID(0xfe31)
