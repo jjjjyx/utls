@@ -37,11 +37,12 @@ type kemPrivateKey struct {
 }
 
 var (
-	X25519Kyber512Draft00    = CurveID(0xfe30)
-	X25519Kyber768Draft00    = CurveID(0x6399)
-	X25519Kyber768Draft00Old = CurveID(0xfe31)
-	P256Kyber768Draft00      = CurveID(0xfe32)
-	invalidCurveID           = CurveID(0)
+	X25519Kyber512Draft00           = CurveID(0xfe30)
+	X25519Kyber512Draft4588_FireFox = CurveID(0x11ec)
+	X25519Kyber768Draft00           = CurveID(0x6399)
+	X25519Kyber768Draft00Old        = CurveID(0xfe31)
+	P256Kyber768Draft00             = CurveID(0xfe32)
+	invalidCurveID                  = CurveID(0)
 )
 
 // Extract CurveID from clientKeySharePrivate
@@ -63,7 +64,7 @@ func clientKeySharePrivateCurveID(ks clientKeySharePrivate) CurveID {
 // Returns scheme by CurveID if supported by Circl
 func curveIdToCirclScheme(id CurveID) kem.Scheme {
 	switch id {
-	case X25519Kyber512Draft00:
+	case X25519Kyber512Draft00, X25519Kyber512Draft4588_FireFox:
 		return hybrid.Kyber512X25519()
 	case X25519Kyber768Draft00, X25519Kyber768Draft00Old:
 		return hybrid.Kyber768X25519()
