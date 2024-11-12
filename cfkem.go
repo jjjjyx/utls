@@ -64,9 +64,9 @@ func clientKeySharePrivateCurveID(ks clientKeySharePrivate) CurveID {
 // Returns scheme by CurveID if supported by Circl
 func curveIdToCirclScheme(id CurveID) kem.Scheme {
 	switch id {
-	case X25519Kyber512Draft00, X25519Kyber512Draft4588_FireFox:
+	case X25519Kyber512Draft00:
 		return hybrid.Kyber512X25519()
-	case X25519Kyber768Draft00, X25519Kyber768Draft00Old:
+	case X25519Kyber768Draft00, X25519Kyber768Draft00Old, X25519Kyber512Draft4588_FireFox:
 		return hybrid.Kyber768X25519()
 	case P256Kyber768Draft00:
 		return hybrid.P256Kyber768Draft00()
